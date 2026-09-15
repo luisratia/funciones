@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1">
+	<meta charset="UTF-8">
+	<title>Metodos EDO</title>
+  <link href="themes/default.css" rel="stylesheet" type="text/css" >
+  <link href="themes/mac_os_x.css" rel="stylesheet" type="text/css" >
+  <link rel="icon" href='favicon.ico' type="image/x-icon">
+  <script src='js/jquery-1.7.2.min.js'></script>
+  <script src="js/vendor/d3.js"></script>
+   <script src="js/math.js"></script>
+  <script src="js/function-plot.js"></script>
+  <script src='js1/ajaxhttp.js'></script>
+  <script type="text/javascript" src="javascripts/prototype.js"> </script>
+  <script type="text/javascript" src="javascripts/window.js"> </script>
+  <script type="text/javascript" src="javascripts/debug.js"> </script>
+  <link rel="stylesheet" type="text/css" href="css/estilo.css">
+  <script>
+  peticion_http= null ; //new descargaArchivo();
+  var niteracion=10;
+  function muestraContenido() {
+if(peticion_http.readyState == 4) {
+if(peticion_http.status == 200) {
+ eval(peticion_http.responseText);
+ }else {peticion_http.abort();}
+}
+}
+  function Coger() {//Función coger, en esta caso le entra
+  //niteracion = Niter();
+	peticion_http= new descargaArchivo();
+	document.getElementById("ideuler").innerHTML = "Procesando datos espere por favor numero de iteraciones..."+niteracion;
+	peticion_http.onreadystatechange = muestraContenido;
+	peticion_http.open('GET', 'euler.txt', true);
+	peticion_http.send(null);
+}
+function abortar(){
+	peticion_http.abort();
+	peticion_http = null;
+	window.location.reload(false);
+	return false;
+}
+</script>
+  <style>
+    body, input, select {
+      font: 12pt sans-serif;
+    }
+    input, select, th, #result {
+      padding: 5px 10px;
+    
+    }
+    th {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div>
+  <center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="195"></center>
+</div>
+<center><h1>Metodos Numericos - EDO Segundo orden</h1></center>
+  <form id="form">
+    <center>
+      <table>
+        <tr>
+            <td>
+              <label for="eq1">df1(t,y,z)/dt=</label>
+            <input type="text" id="eq1" size = '35' value="z" />
+			</td>  
+        </tr>
+		<tr>
+            <td>
+              <label for="eq2">df2(t,y,z)/dt=</label>
+            <input type="text" id="eq2" size = '35' value="-12*z - 100*y + 48*sin(10*t)" />
+			</td>  
+        </tr>
+        <tr style="display:;" id="tr04">
+        
+         <td>
+          t0:<input type="number" min='0' max='20' step='0.01' value="0" id="a"  name="a"  title="Valor de t0" onchange="Niter();">
+          y0:<input type="number" min='-10' max='10' step='0.01' value="0" id="yo"  name="yo" onchange='' title="Valor de y0" >
+		  z0:<input type="number" min='-10' max='10' step='0.01' value="0" id="zo"  name="zo" onchange='' title="Valor de z0" >
+
+        </td>
+		</tr>
+		<tr><td>
+        tf:<input type="number"  name="b" id="b" min='0' max='20' step='0.01' value ="0.8" title="Valor de tf" onchange="Niter();">
+             h:<input type="number"  name="h" id="h" min='0.01' max='1' step='0.01' value ="0.04" 
+            onchange="Niter();" title="Valor del incremento" >
+          </td>
+		  </tr>
+		  <tr>
+          <td>
+              <input type="button" onclick="winformxxx();" value="Draw-fly" />
+			  <input type="button" onclick="abortar();" value="Cancelar" />
+			<input type="button" onclick="Euler();" value="Solver &nbsp &nbsp" />
+          </td>
+        </tr>
+        <tr style="display:;" id="tr05">
+          
+          
+        </tr>
+      </table>
+    </center>
+</form>
+<br><br>
+ <center><span id="sample-1"></span></center>
+<script>
+</script>
+
+  <span id="tip"></span>
+    <span id="tip2"></span>
+
+  <span id="sample-3"></span>
+  <center><span id="sample-4"></span></center>
+  <span id="ideuler"> </span>
+   <center><span id="puntos"></span></center>
+
+  <center><span style="display: none;" id="formula2"></span></center>
+
+  <script>
+function Niter(){
+	var to = parseFloat(document.getElementById("a").value);
+	var tf = parseFloat(document.getElementById("b").value);
+	var h = parseFloat(document.getElementById("h").value);
+	niteracion = (tf - to)/h;
+}
+
+var parser = math.parser();
+var s1,s2, f, max_y=-10,min_y=0, tini, tfin;
+
+function winformxxx() {
+win = new Window({className: "mac_os_x", maximizable:true, resizable:true, title:"Metodos Numericos", 
+  width:(window.innerWidth*80/100), height:(window.innerHeight*90/100), destroyOnClose:true}); 
+win.getContent().innerHTML = "<PRE><center><div id='puntos'></div></center></PRE>";
+
+  //"<div id='sample-4'></div>";   
+win.setConstraint(false);
+win.showCenter(false);
+win.toFront(false);
+drawing(s1,s2,tini,tfin,min_y,max_y);//evaluador(); //draw();
+}
+
+
+function fun_formular2plot(){ 
+ var Formula2 = "<table width='40%'  ALIGN='center'>";
+Formula2 += "<tr><td><input type='range' id='mx1' name='mx1' min='-10' max='0' step='0.1' value='-10' onchange='alerta_2();'></td>";
+Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tmx1' id='tmx1' value='x=-10'></td>";
+Formula2 += "<td> <input type='range' id='my1' name='my1' min='-10' max='0' step='0.1' value='-4' onchange='alerta_2();'></td>";
+Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tmy1' id='tmy1' value='y=-4'> </td></tr>";
+Formula2 += "<tr><td><input type='range' id='px1' name='px1' min='0' max='10' step='0.1' value='10' onchange='alerta_2();'></td>";
+Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tpx1' id='tpx1' value='x=10'></td>";
+Formula2 += "<td><input type='range' id='py1' name='py1' min='0' max='10' step='0.1' value='4' onchange='alerta_2();'></td>";
+Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tpy1' id='tpy1' value='y=4'> </td></tr>";
+ Formula2 += "<table width='40%'>";
+ Formula2 += "<tr><td style='border-width: 0px;'></td><td style='border-width: 0px;'></td></tr>";
+Formula2 += "<tr>";
+Formula2 += "<td style='border-width: 0px;'><input type='button' value='Redraw'  class='miBoton1' onclick = 'evaluador();'></td>";
+//Formula2 += "<td>&nbsp;&nbsp;&nbsp;</td>";
+Formula2 += "<td style='border-width: 0px;'><input type='button' class='miBoton1' value='Graf' onclick='winform();'></td>";
+//Formula2 += "<td>&nbsp;&nbsp;&nbsp;</td>";
+Formula2 += "</tr>";
+Formula2 += "</table>";
+Formula2 += "</table>";
+
+document.getElementById("formula2").innerHTML = Formula2;
+} 
+
+
+function alertaplot(){
+  
+  document.getElementById("ta").value =   document.getElementById("a").value;
+  document.getElementById("tb").value =   document.getElementById("b").value;
+  
+}
+
+function Euler(){
+var samples = []; var samples2 = []; var samples3 = [];
+max_y =-100; min_y =100;
+var to = parseFloat(document.getElementById("a").value);
+var tf = parseFloat(document.getElementById("b").value);
+var h = parseFloat(document.getElementById("h").value);
+var niteraciones = (tf - to)/h;
+while((niteraciones > 500)){
+	h = 2*h; 
+	niteraciones = (tf - to)/h;
+	}
+var v = parseFloat(document.getElementById("yo").value);
+var z = parseFloat(document.getElementById("zo").value);
+
+var vr =v;
+var t = to; tini =to; tfin = tf;
+var tr =t;
+var ndig =10; 
+samples.push([parseFloat(t), parseFloat(z)]); 
+samples2.push([parseFloat(tr), parseFloat(vr)]);
+try { 
+var df1 = document.getElementById('eq1').value;
+var df2 = document.getElementById('eq2').value; 
+ 
+var i =0;
+var cout = "<table border='0'  width='100%'>";
+cout += "<caption style='color:#fff;background-color:#dd4814;'><big>Metodo de Euler</big></caption>";
+cout += "<tr><th>   i  </th><th>   t(i)   </th><th>   g(t)      </th><th>    f(xr)   </th><th> Error </th></tr>";
+//parser.set('t',t); 
+var n1 =0;
+cout += "<tr><td>"+ i + "</td><td>"+ Number(tr).toFixed(4) +"</td><td>" + (Number(z)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td></tr>";
+ document.getElementById("ideuler").innerHTML = cout; 
+while (tr < tf){
+if (max_y < parseFloat(z)){max_y = parseFloat(z);}
+if (min_y > parseFloat(z)){min_y = parseFloat(z);}
+
+i++; 
+
+var k11 = dfdx(df1,tr,vr,z); 
+var c11 = dfdx(df2,tr,vr,z); 
+
+var k22 = dfdx(df1,tr+(h/2),vr+(1/2)*k11*h, z+(1/2)*h*c11);
+var c22 = dfdx(df2,tr+(h/2),vr+(1/2)*k11*h, z+(1/2)*h*c11);
+
+var k33 = dfdx(df1,tr+(h/2),vr+(1/2)*k22*h, z+(1/2)*h*c22);
+var c33 = dfdx(df2,tr+(h/2),vr+(1/2)*k22*h, z+(1/2)*h*c22);
+
+var k44 = dfdx(df1,tr+h,vr+k33*h, z+h*c33);
+var c44 = dfdx(df2,tr+h,vr+k33*h, z+h*c33);
+
+vr = vr + (h/6)*(k11+2*k22+2*k33+k44);
+z = z + (h/6)*(c11+2*c22+2*c33+c44);
+
+tr = math.round(tr + h,6);
+samples2.push([parseFloat(tr), parseFloat(vr)]);
+samples.push([parseFloat(tr), parseFloat(z)]);
+
+if (max_y < parseFloat(z)){max_y = parseFloat(z);}
+if (max_y < parseFloat(vr)){max_y = parseFloat(vr);}
+if (min_y > parseFloat(z)){min_y = parseFloat(z);}
+if (min_y > parseFloat(vr)){min_y = parseFloat(vr);}
+
+cout += "<tr><td>"+ i + "</td><td>"+ Number(tr).toFixed(4) +"</td><td>" + (Number(z)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td></tr>";
+ document.getElementById("ideuler").innerHTML = cout;
+}
+    s1 = samples;
+    s2 = samples2;
+    cout +="</table>";
+
+}
+ catch (err) {
+      alert(err);
+    }
+}
+ 
+
+
+
+function dfdx(df,t,y,z){
+ // var parser = math.parser();
+  
+  parser.eval('g(t,y,z) ='+df);
+  parser.set('t',t);
+  parser.set('y',y);
+  parser.set('z',z);
+  var g1 = parser.eval('g(t,y,z)'); 
+  g1 = parseFloat(g1);
+    return g1;
+}
+
+function drawing(s,exacta,xmin,xmax,ymin,ymax){
+try{ 
+functionPlot({
+    target: '#puntos',
+    tip: {
+    xLine: true,    // dashed line parallel to y = 0
+    yLine: true,    // dashed line parallel to x = 0
+    
+  },
+  width:(window.innerWidth*.7),  // width:(screen.availWidth*.7),
+  height:(window.innerHeight*.7),     //height:(screen.availHeight*.7),
+  xAxis:{domain: [xmin, xmax],label:'eje-x'},
+  yAxis:{domain: [ymin, ymax],label:'eje-y'},
+  grid: true,
+  data: [
+  {
+    color: '',
+    points:s,     //P, 
+    fnType: 'points',
+    graphType:'polyline'
+
+  },
+
+  { 
+    color: 'red',
+     points:exacta,
+      fnType: 'points',
+      graphType: 'polyline'
+
+  }]
+})
+}
+ catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+          //document.getElementById("formula2").style="display:block";
+          //functionPlot().url;
+}
+
+  	function iniciar(){
+      //fun_formular2plot();
+       Niter();
+      //puntos();
+  	}
+
+window.onload=iniciar();
+
+  </script>
+
+</body>
+</html>

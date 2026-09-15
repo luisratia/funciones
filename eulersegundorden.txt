@@ -1,0 +1,79 @@
+var samples = []; var samples2 = [];
+max_y =-100; min_y =100;
+var to = parseFloat(document.getElementById("a").value);
+var tf = parseFloat(document.getElementById("b").value);
+var h = parseFloat(document.getElementById("h").value);
+var niteraciones = (tf - to)/h;
+while((niteraciones > 2000)){
+	h = 2*h; 
+	niteraciones = (tf - to)/h;
+	}
+var v = parseFloat(document.getElementById("yo").value);
+var z = parseFloat(document.getElementById("zo").value);
+
+var vr =v;
+var t = to; tini =to; tfin = tf;
+var tr =t;
+var ndig =10; 
+samples.push([parseFloat(t), parseFloat(z)]); 
+samples2.push([parseFloat(tr), parseFloat(vr)]);
+try { 
+var df1 = document.getElementById('eq1').value;
+var df2 = document.getElementById('eq2').value; 
+exacta = new String(document.getElementById('eq3').value);
+exacta = exacta.trim();
+var i =0;
+var cout = "<table class='table'>";
+cout += "<tbody style='color:#fff;background-color:#dd4814;'>Metodo de Euler / RK-4</tbody>";
+cout += "<tr><th>   i  </th><th>   t(i)   </th><th style='color:blue;'>   Z(t)      </th><th style='color:red;'>    Y(t)   </th></tr>";
+//parser.set('t',t); 
+var n1 =0;
+cout += "<tr><td>"+ i + "</td><td>"+ Number(tr).toFixed(4) +"</td><td>" + (Number(z)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td></tr>";
+ //document.getElementById("ideuler").innerHTML = cout; 
+while (tr < tf){
+if (max_y < parseFloat(z)){max_y = parseFloat(z);}
+if (min_y > parseFloat(z)){min_y = parseFloat(z);}
+
+i++; 
+
+var k11 = dfdx(df1,tr,vr,z); 
+var c11 = dfdx(df2,tr,vr,z); 
+
+var k22 = dfdx(df1,tr+(h/2),vr+(1/2)*k11*h, z+(1/2)*h*c11);
+var c22 = dfdx(df2,tr+(h/2),vr+(1/2)*k11*h, z+(1/2)*h*c11);
+
+var k33 = dfdx(df1,tr+(h/2),vr+(1/2)*k22*h, z+(1/2)*h*c22);
+var c33 = dfdx(df2,tr+(h/2),vr+(1/2)*k22*h, z+(1/2)*h*c22);
+
+var k44 = dfdx(df1,tr+h,vr+k33*h, z+h*c33);
+var c44 = dfdx(df2,tr+h,vr+k33*h, z+h*c33);
+
+vr = vr + (h/6)*(k11+2*k22+2*k33+k44);
+z = z + (h/6)*(c11+2*c22+2*c33+c44);
+
+tr = math.round(tr + h,6);
+samples2.push([parseFloat(tr), parseFloat(vr)]);
+samples.push([parseFloat(tr), parseFloat(z)]);
+
+if (max_y < parseFloat(z)){max_y = parseFloat(z);}
+if (max_y < parseFloat(vr)){max_y = parseFloat(vr);}
+if (min_y > parseFloat(z)){min_y = parseFloat(z);}
+if (min_y > parseFloat(vr)){min_y = parseFloat(vr);}
+
+cout += "<tr><td>"+ i + "</td><td>"+ Number(tr).toFixed(4) +"</td><td>" + (Number(z)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td></tr>";
+ //document.getElementById("ideuler").innerHTML = cout;
+}
+    s1 = samples;
+    s2 = samples2;
+    cout +="</table>";
+
+}
+ catch (err) {
+      alert(err);
+    }
+	 document.getElementById("ideuler").innerHTML = cout;
+
+
+ 

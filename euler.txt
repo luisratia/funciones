@@ -1,0 +1,49 @@
+var samples = []; var samples2 = [];
+max_y =-100; min_y =100;
+var to = parseFloat(document.getElementById("a").value);
+var tf = parseFloat(document.getElementById("b").value);
+var h = parseFloat(document.getElementById("h").value);
+var niteraciones = (tf - to)/h;
+while((niteraciones > 1000)){
+	h = 2*h; 
+	niteraciones = (tf - to)/h;
+	}
+var v = parseFloat(document.getElementById("yo").value);
+var vr =v;
+var t = to; tini =to; tfin = tf;
+var tr =t;
+var ndig =10; samples.push([parseFloat(t), parseFloat(v)]); samples2.push([parseFloat(tr), parseFloat(vr)]);try { 
+var df = document.getElementById('eq').value; var i =0;
+var cout = "<table class='table'>";
+cout += "<tbody style='color:#fff;background-color:#dd4814;'>Metodo de Euler / RK-4</tbody>";
+cout += "<tr><th>   i  </th><th>   t(i)   </th><th style='color:blue;'>   g(t) Euler     </th><th style='color:Red;'>    f(xr) RK-4   </th><th> Error </th></tr>";
+parser.set('t',t); 
+var n1 =0;
+cout += "<tr><td>"+ i + "</td><td>"+ Number(t).toFixed(4) +"</td><td>" + (Number(v)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td><td>"+ (Number(math.abs(v - vr))).toExponential(ndig) + "</td></tr>";
+
+while (t < tf){
+if (max_y < parseFloat(v)){max_y = parseFloat(v);}
+if (min_y > parseFloat(v)){min_y = parseFloat(v);}
+var v1 = dfdx(df,t,v);var k1 = h*v1;var v2 = dfdx(df,t+h,v+k1);v = v + (h/2)*(v1+v2);t = math.round(t + h,6);i++;
+samples.push([parseFloat(t), parseFloat(v)]); var k11 = dfdx(df,tr,vr); var k22 = dfdx(df,tr+(h/2),vr+(1/2)*k11*h);
+var k33 = dfdx(df,tr+(h/2),vr+(1/2)*k22*h);
+var k44 = dfdx(df,tr+h,vr+k33*h);
+vr = vr + (h/6)*(k11+2*k22+2*k33+k44);tr = math.round(tr + h,6);samples2.push([parseFloat(tr), parseFloat(vr)]);
+if (max_y < parseFloat(v)){max_y = parseFloat(v);}
+if (max_y < parseFloat(vr)){max_y = parseFloat(vr);}
+if (min_y > parseFloat(v)){min_y = parseFloat(v);}
+if (min_y > parseFloat(vr)){min_y = parseFloat(vr);}
+
+cout += "<tr><td>"+ i + "</td><td>"+ Number(t).toFixed(4) +"</td><td>" + (Number(v)).toFixed(ndig)+"</td>"+
+"<td>" + (Number(vr)).toFixed(ndig)+"</td><td>"+ Number(math.abs(math.round(v - vr,ndig))).toExponential(ndig) + "</td></tr>";
+}
+    s1 = samples;
+    s2 = samples2;
+    cout +="</table>";
+
+}
+ catch (err) {
+      alert(err);
+    }
+document.getElementById("ideuler").innerHTML = cout;

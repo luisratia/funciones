@@ -1,0 +1,15 @@
+
+try{
+var eq = new String(document.getElementById('eq').value);
+eq = eq.trim();
+//step = 0.001;
+var valorintegral= integrate(eq, 0, 5, 0.001);
+ 
+}
+catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+	document.getElementById("cajadatosfx").value = valorintegral;
+	
+

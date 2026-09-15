@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+
+	<title>Web Storage API</title>
+	<script src='js1/jquery-1.7.2.js'></script>
+	<script src="js1/vendor/d3.js"></script>
+	<script src="js1/math.js"></script>
+	<script src="js1/function-plot.js"></script>
+	<script src='js1/ajaxhttp.js'></script>
+	<script src="js1/storage.js"></script>
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/miestiloflex.css">
+	<link rel="stylesheet" href="storage.css">
+	
+	<script type="text/javascript">
+var visible = false;
+		function iniciar() {
+		var elemento = document.getElementById("menuicono");
+		elemento.addEventListener("click", mostrarMenu());
+	}
+	function openmenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "block";
+}
+	function closemenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "none";
+}
+
+	function mostrarMenu() {
+		var elemento = document.getElementById("menuprincipal");
+		if (!visible) {
+		elemento.style.display = "flex";
+		visible = true;
+	} else {
+	elemento.style.display = "none";
+	visible = false;
+	}
+	}
+// Preparar la funcion de respuesta
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+// Realizar peticion HTTP
+peticion_http.open('GET', 'codigojavascript.txt', true);
+peticion_http.send(null);
+
+function muestraContenido() {
+if(peticion_http.readyState == 4) {
+if(peticion_http.status == 200) {
+ eval(peticion_http.responseText)}
+}
+}
+
+function Coger() {//Función coger, en esta caso le entra
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+peticion_http.open('GET', 'derivajavascript.txt', true);
+peticion_http.send(null);
+}
+function abortar(){
+	peticion_http.abort();
+	peticion_http = null;
+	window.location.reload(false);
+	return false;
+}
+
+function Integral() {//Función coger, en esta caso le entra
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+peticion_http.open('GET', 'integrajavascript.txt', true);
+peticion_http.send(null);
+}
+
+function derivadaImplcit() {//Función coger, en esta caso le entra
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+peticion_http.open('GET', 'derivadaImplicita.txt', true);
+peticion_http.send(null);
+}
+
+function getRandInteger(min, max){
+	return (Math.floor(Math.random()*(max - min +1) + min));
+}
+
+
+function asignaFunct(){
+n1 = getRandInteger(1, 3);
+n = getRandInteger(1, 6);
+m = getRandInteger(1, 4);
+cadena =m+ "*cosh(x)^"+n+"+sinh(x)^"+n1;
+document.getElementById('eq').value=cadena;
+}
+
+function asignaCadena(){
+n1 = getRandInteger(1, 2);
+n = getRandInteger(1, 2);
+m = getRandInteger(2, 4);
+cadena = m+"*cosh(x)^"+n+"+sinh(x)^"+n1;
+if ((n==1) && (n1!=1)){
+	cadena = m+"*cosh(x)"+" +sinh(x)^"+n1;
+}
+if ((n!=1) && (n1==1)){
+	cadena = m+"*cosh(x)^"+n +" +sinh(x)";
+}
+if ((n==1) && (n1==1)){
+	cadena = m+"*cosh(x)" +" +sinh(x)";
+}
+
+
+return cadena;
+//document.getElementById('eq').value=cadena;
+}
+var parser = math.parser();
+
+function integrate(eq, start, end, step) {
+		var total = 0.0;
+		//step=0.001; //step || 0.01;
+		parser.eval('g(x) ='+eq);
+		for (var x = start; x <= end; x += step) {
+			parser.set('x',x);
+			parser.set('step',step);
+			g1= parser.eval('g(x +step/2)');
+			g1 = parseFloat(g1);
+			total = total+ g1*step;
+	}
+	return total;
+}
+
+
+function ArregloFunct(){
+var versionesObj = new Array(
+'x',
+'x^2',
+'x^3',
+'x^4',
+'x^5');
+
+var operadoresObj = new Array(
+'+',
+'-',
+'*',
+'/');
+n = versionesObj.length;
+k = operadoresObj.length;
+j = getRandInteger(0, k-1);
+i = getRandInteger(0, n-1);
+//m = operadoresObj[j];
+cadena2=versionesObj[i];
+cadena = asignaCadena();
+document.getElementById('eq').value=cadena2+" "+operadoresObj[j]+" ("+cadena+")";
+//return cadena2;
+}
+
+</script>
+</head>
+<body>
+<header id="menuicono-img">
+	<div style="positionion:relative; top:0;left:0;"><center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="195"></center></div>
+
+	<div id="menuicono" onclick="mostrarMenu();">
+
+	<img src="img/iconmenu.png"  style="width: 10%;">
+	</div>
+	</header>
+	<div id="mainmenu" onclick="closemenu();">
+					<nav id="menu-mini">
+						<div id="closemenu">
+							<img src="iconclose.png" style="width: 100%;" onclick="closemenu();">
+						</div>
+						<div class="menu-item">
+							<a href="/">Principal</a>
+						</div>
+						<div class="menu-item">
+							<a href="/books.php">Libros</a>
+						</div>
+						<div class="menu-item">
+							<a href="/guides.php">Guías Rápidas</a>
+						</div>
+						<div class="menu-item">
+							<a href="/videocourses.php">Cursos en Video</a>
+						</div>
+						<div class="menu-item">
+							<a href="/newsletter.php">Boletín</a>
+						</div>
+						<div class="menu-item">
+							<a href="/contact.php">Contacto</a>
+						</div>
+					</nav>
+				</div>
+	<nav id="menuprincipal">
+	<div>
+	<ul>
+		<li><a href="index.html">Principal</a></li>
+		<li><a href="implicitdex.html">Implicitas</a></li>
+		<li><a href="parametrictdex.html">Parametricas</a></li>
+		<li><a href="polardex.html">Polares</a></li>
+		<li><a href="ecuadif1.html">EDO</a></li>
+		<li><a href="ecuadif2orden.html">EDO2</a></li>
+		<li><a href="storage.html">df(x)/dx</a></li>
+	</ul>
+	</div>
+	</nav>
+	<main>
+	<div>
+<section id="articulosprincipales">
+	<article>
+		<h1>Calculo simbolico de la derivada</h1>
+		<time datetime="2016-12-23" pubdate>
+			<div class="numerodia">23</div>
+			<div class="nombredia">Viernes</div>
+		</time>
+		<p>Una de las operaciones mas importantes sobre una funcion f es el calculo de su derivada, La funcion puede estar dada en forma explicita y = f(x) o en forma Implicita f(x, y) = 0.</p>
+	<figure>
+
+<section id="cajaformulario">
+<form name="formulario" id="form" class="form">
+<p>f(x)/f(x,y)=0:<br><input type="text" name="clave" id="clave" placeholder="Introduzca Ecuacion"></p>
+<p>dy/dx:<br><textarea name="texto" id="texto" placeholder="mostrar Resultado.."></textarea></p>
+
+<!--<p><input type="button" name="boton2" id="boton2" onclick ='mostrar();' value="mostrar"></p>-->
+<input type="button" title="Calculo: f explicita" class='btn btn-warning' onclick="Coger();" value="f'(x)">
+<input type="button" title="Calculo: f Implicita" class='btn btn-primary' onclick="derivadaImplcit();" value="dy/dx">
+
+<input type="button" title="Guardar, Web storage" class='btn btn-danger' name="grabar" id="grabar" value="Grab">
+<!--<button class='btn btn-danger btn-circle btn-x1' onclick="abortar();">Cancelar</button>-->
+
+</form>
+</figure>
+	</article>
+	<article>
+</section>
+<section id="cajadatos">
+No hay información disponible
+</section>
+<aside id="infoadicional">
+	<h1></h1>
+	<p></p>
+	<p></p>
+	</aside>
+	<div class="recuperar"></div>
+	</div>
+	</main>
+	<footer id="pielogo">
+	<div>
+	<section class="seccionpie">
+	<h1>Sitio Web</h1>
+	<p><a href="index.html">Principal</a></p>
+	<p><a href="fotos.html">Fotos</a></p>
+	<p><a href="videos.html">Videos</a></p>
+	</section>
+	<section class="seccionpie">
+	<h1>Ayuda</h1>
+	<p><a href="contacto.html">Contacto</a></p>
+	</section>
+	<section class="seccionpie">
+	<address>Toronto, Canada</address>
+	<small>&copy; Derechos Reservados 2016</small>
+	</section>
+	<div class="recuperar"></div>
+	</div>
+	</footer>
+</body>
+</html>

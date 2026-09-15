@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+	<title>Plot </title>
+	<meta charset="utf-8">
+	<link rel="icon" href='favicon.ico' type="image/x-icon">
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+	<meta name="description" content="Este es un documento HTML5">
+	<meta name="keywords" content="HTML, CSS, JavaScript">
+	<link href="themes/default.css" rel="stylesheet" type="text/css" >
+	<link href="themes/mac_os_x.css" rel="stylesheet" type="text/css" >
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/miestiloflex.css">
+	<script src='js1/jquery-1.7.2.js'></script>
+	<script src="js1/vendor/d3.js"></script>
+	<script src="js1/math.js"></script>
+	<script src="js1/function-plot.js"></script>
+	<script type="text/javascript" src="javascripts/prototype.js"> </script>
+	<script type="text/javascript" src="javascripts/window.js"> </script>
+	<script type="text/javascript" src="javascripts/debug.js"> </script>
+	<script>
+		var visible = false;
+		function iniciar() {
+		var elemento = document.getElementById("menuicono");
+		elemento.addEventListener("click", mostrarMenu());
+	}
+	function openmenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "block";
+}
+	function closemenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "none";
+}
+
+	function mostrarMenu() {
+		var elemento = document.getElementById("menuprincipal");
+		if (!visible) {
+		elemento.style.display = "flex";
+		visible = true;
+	} else {
+	elemento.style.display = "none";
+	visible = false;
+	}
+	}
+	function ocultarPanel() {
+		var elemento = document.getElementById("formula2");
+		if (elemento.style.display == "none") {
+		elemento.style.display = "flex";
+		}else elemento.style.display = "none";
+	}
+	window.addEventListener("load", iniciar());
+	//window.onload=iniciar();
+	</script>
+	</script>
+	<style>
+    td {
+      font-size:1.2em;
+	  border-width: 0px;
+    }
+    .btn-circle.btn-sm{
+		width: 30px;
+		height: 30px;
+		padding: 0px 0px;
+		border-radius:15px;
+		font-size: 0.5em;
+		text-align: center;
+	}
+	
+	.btn-circle.btn-md{
+		width: 50px;
+		height: 50px;
+		padding: 0px 0px;
+		border-radius:25px;
+		font-size: 0.6em;
+		text-align: center;
+	}
+	.btn-circle.btn-x1{
+		width: 70px;
+		height: 70px;
+		padding: 0px 0px;
+		border-radius:35px;
+		font-size: 0.7em;
+		text-align: center;
+	}
+	
+  </style>
+	</head>
+
+	<body>
+	<header id="menuicono-img">
+	<div style="positionion:relative; top:0;left:0;"><center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="195"></center></div>
+	<div id="menuicono" onclick="mostrarMenu();">
+	
+	<img src="img/iconmenu.png"  style="width: 10%;">
+	</div>
+	</header>
+	<div id="mainmenu" onclick="closemenu();">
+					<nav id="menu-mini">
+						<div id="closemenu">
+							<img src="iconclose.png" style="width: 100%;" onclick="closemenu();">
+						</div>
+						<div class="menu-item">
+							<a href="/">Principal</a>
+						</div>
+						<div class="menu-item">
+							<a href="/books.php">Libros</a>
+						</div>
+						<div class="menu-item">
+							<a href="/guides.php">Guías Rápidas</a>
+						</div>
+						<div class="menu-item">
+							<a href="/videocourses.php">Cursos en Video</a>
+						</div>
+						<div class="menu-item">
+							<a href="/newsletter.php">Boletín</a>
+						</div>
+						<div class="menu-item">
+							<a href="/contact.php">Contacto</a>
+						</div>
+					</nav>
+				</div>
+	<nav id="menuprincipal">
+	<div>
+	<ul>
+		<li><a href="index.html">Principal</a></li>
+		<li><a href="implicitdex.html">Implicitas</a></li>
+		<li><a href="parametrictdex.html">Parametricas</a></li>
+		<li><a href="polardex.html">Polares</a></li>
+	</ul>
+	</div>
+	</nav>
+	<main>
+	<div>
+	<section id="articulosprincipales">
+	<article>
+		<h1>Ecuaciones Polares r = g(&#952)</h1>
+		<time datetime="2016-12-23" pubdate>
+			<div class="numerodia">23</div>
+			<div class="nombredia">Viernes</div>
+		</time>
+		<p></p>
+	<figure>
+		<div id="plot"></div>
+
+<form id="form"> 
+	<table class='table'><tr><td>r =
+  <input  type="text" size ="18" id="eq" value="2*sin(4*theta)" /></td><td>
+  r =<input  type="text" size="18" id="geq" value="2" /></td></tr></table>
+</form>
+		<div id="formula2" style='display:none;'></div>
+		<div id="panel"></div>
+
+	</figure>
+	</article>
+	<article>
+	<h1>Caracteristicas y propiedades</h1>
+	<time datetime="2016-12-7" pubdate>
+	<div class="numerodia">7</div>
+	<div class="nombredia">Miércoles</div>
+	</time>
+	<p></p>
+	<figure>
+	<!--<img src="img/diapositiva1.jpg">-->
+	</figure>
+	</article>
+	</section>
+	<aside id="infoadicional">
+	<h1></h1>
+	<p></p>
+	<p></p>
+	</aside>
+	<div class="recuperar"></div>
+	</div>
+	</main>
+	<footer id="pielogo">
+	<div>
+	<section class="seccionpie">
+	<h1>Sitio Web</h1>
+	<p><a href="index.html">Principal</a></p>
+	<p><a href="fotos.html">Fotos</a></p>
+	<p><a href="videos.html">Videos</a></p>
+	</section>
+	<section class="seccionpie">
+	<h1>Ayuda</h1>
+	<p><a href="contacto.html">Contacto</a></p>
+	</section>
+	<section class="seccionpie">
+	<address>Toronto, Canada</address>
+	<small>&copy; Derechos Reservados 2016</small>
+	</section>
+	<div class="recuperar"></div>
+	</div>
+	</footer>
+	
+<script>
+function drawpolar() {
+
+    var eq = new String(document.getElementById('eq').value);
+        eq = eq.trim();
+	var geq = new String(document.getElementById('geq').value);
+        geq = geq.trim();
+		var str = new String(document.querySelector('input[name="typograf"]:checked').value);
+	document.getElementById("plot").innerHTML = '';
+		rangNeg = parseFloat((document.getElementById('rangNeg').value).toString());
+		rangPos = parseFloat((document.getElementById('rangPos').value).toString());
+    try {
+    functionPlot({
+      target: '#plot',
+      width:(window.innerWidth*.7),  // width:(screen.availWidth*.7),
+      height:(window.innerWidth*.7),     //height:(screen.availHeight*.7),
+      xAxis:{domain: [document.getElementById('mx1').value, document.getElementById('px1').value ]},
+      yAxis:{domain: [document.getElementById('my1').value,document.getElementById('py1').value ]},
+      grid: true,
+      data: [{
+          r:eq, 
+		  //y:geq,
+		  range: [rangNeg, rangPos],
+		  
+          fnType: 'polar',
+		  nSamples: 2000,
+		  graphType:str //'scatter'
+		  
+      },{
+	  r:geq, 
+		  //y:geq,
+		  range: [rangNeg, rangPos],
+		  
+          fnType: 'polar',
+		  nSamples: 2000,
+		  graphType:str // 'scatter'
+	  
+	  
+	  }]
+    });
+
+ }
+    catch (err) {
+     // console.log(err);
+      alert(err);
+    }
+      //document.getElementById("formula2").style="display:block";
+	document.getElementById("botonwin").disabled=false;
+
+}
+function winpolar() {
+if (window.innerWidth*0.7< window.innerHeight*0.7){
+			tamano = window.innerWidth*0.8;
+	}else{tamano = window.innerHeight*0.8;}
+win = new Window({className: "mac_os_x", maximizable:false, resizable:true, title:"Metodos Numericos", 
+  width:tamano, height:tamano, destroyOnClose:true}); 
+win.getContent().innerHTML = "<PRE><center><div id='plot'></div></center></PRE>";
+
+  //"<div id='sample-4'></div>";   
+win.setConstraint(false);
+win.showCenter(false);
+win.toFront(false);
+ drawpolar();
+document.getElementById("botonwin").disabled=true;
+
+}
+
+
+
+  function fun_formular2(){ 
+ var Formula2 = "<table class='table'>";
+ Formula2 +='<tr><td>theta:<input  type="number" size="5" min="-20" max="0" id="rangNeg" value="0" /></td><td><input  type="number" size="5" min="0" max="90" id="rangPos" value="10" /></td></tr>'
+Formula2 += "<tr><td>x:<input type='number' id='mx1' name='mx1' min='-10' max='0' size='10' step='0.1' value='-2' onchange='drawpolar();'></td>";
+//Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tmx1' id='tmx1' value='x=-10'></td>";
+Formula2 += "<td>y: <input type='number' id='my1' name='my1' min='-10' max='0' size='10' step='0.1' value='-2' onchange='drawpolar();'></td>";
+//Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tmy1' id='tmy1' value='y=-4'> </td></tr>";
+Formula2 += "<tr><td>x:<input type='number' id='px1' name='px1' min='0' max='10' size='10' step='0.1' value='2'  onchange='drawpolar();'></td>";
+//Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tpx1' id='tpx1' value='x=10'></td>";
+Formula2 += "<td>y:<input type='number' id='py1' name='py1' min='0' max='10' size='10' step='0.1' value='2' onchange='drawpolar();'></td></tr>";
+Formula2 +="<tr><td>scatter<input type='radio' id='scatter'  name='typograf' value='scatter' onchange='drawpolar();'></td>";
+Formula2 +='<td>polilyne<input type="radio" id="polyline" name="typograf" value="polyline" checked onchange="drawpolar();"></td></tr></table>';
+//Formula2 += "<td><input type='text' readonly class='input-box'  size='5' name='tpy1' id='tpy1' value='y=4'> </td></tr>";
+ var Formula3 = "<table class='table' width='40%'>";
+ //Formula2 += "<tr><td></td><td></td></tr>";
+Formula3 += "<tr>";
+Formula3 += "<td><input type='button'   value='Redraw'  class='btn btn-primary btn-circle btn-x1' onclick ='drawpolar();'> </td>";
+Formula3 += "<td><input type='button'   value='Panel'  class='btn btn-primary btn-circle btn-x1' onclick ='ocultarPanel();'> </td>";
+//Formula2 += "<td>&nbsp;&nbsp;&nbsp;</td>";
+Formula3 += "<td><input type='button' id='botonwin' class='btn btn-danger btn-circle btn-x1' value='winPolar' onclick='winpolar();'></td>";
+//Formula2 += "<td>&nbsp;&nbsp;&nbsp;</td>";
+Formula3 += "</tr>";
+Formula3 += "</table>";
+//Formula2 += "</table>";
+
+document.getElementById("formula2").innerHTML = Formula2;
+document.getElementById("panel").innerHTML = Formula3;
+} 
+window.onload=fun_formular2();
+
+  drawpolar();
+</script>
+	</body>
+	
+	</html>

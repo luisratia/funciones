@@ -1,0 +1,11 @@
+var eq = new String(document.getElementById('eq').value);
+eq = eq.trim();
+try{
+var h = math.parse(eq); 
+var dfx = math.derivative(h, 'x').toString(); 
+}
+catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+document.getElementById("cajadatosfx").value = dfx;

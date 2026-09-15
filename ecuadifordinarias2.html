@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1">
+	<meta charset="UTF-8">
+	<title>Metodos EDO</title>
+  <link href="themes/default.css" rel="stylesheet" type="text/css" >
+  <link href="themes/mac_os_x.css" rel="stylesheet" type="text/css" >
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/miestiloflex.css">
+  <link rel="icon" href='favicon.ico' type="image/x-icon">
+  <script src='js1/jquery-1.7.2.min.js'></script>
+  <script src="js1/vendor/d3.js"></script>
+   <script src="js1/math.js"></script>
+  <script src="js1/function-plot.js"></script>
+  <script src='js1/ajaxhttp.js'></script>
+  <script type="text/javascript" src="javascripts/prototype.js"> </script>
+  <script type="text/javascript" src="javascripts/window.js"> </script>
+  <script type="text/javascript" src="javascripts/debug.js"> </script>
+  <link rel="stylesheet" type="text/css" href="css/estilo.css">
+  <script>
+  peticion_http= null ; //new descargaArchivo();
+  var niteracion=10;
+  function muestraContenido() {
+if(peticion_http.readyState == 4) {
+if(peticion_http.status == 200) {
+ eval(peticion_http.responseText);
+ }else {peticion_http.abort();}
+}
+}
+  function Coger() {//Función coger, en esta caso le entra
+	peticion_http= new descargaArchivo();
+	document.getElementById("puntos").style.display="none";
+	document.getElementById("ideuler").innerHTML = "Procesando datos espere por favor numero de iteraciones..."+niteracion;
+	peticion_http.onreadystatechange = muestraContenido;
+	peticion_http.open('GET', 'euler.txt', true);
+	peticion_http.send(null);
+}
+function abortar(){
+	peticion_http.abort();
+	peticion_http = null;
+	window.location.reload(false);
+	return false;
+}
+function ocultarPanel() {
+		var elemento = document.getElementById("puntos");
+		if (elemento.style.display == "none") {
+		elemento.style.display = "flex";
+		}else {
+		elemento.style.display = "none";
+		}
+		draw(s1,s2,tini,tfin,min_y,max_y);
+	}
+</script>
+  <style>
+    body, input, select {
+      font: 12pt sans-serif;
+    }
+    input, select, th, #result {
+      padding: 5px 10px;
+    
+    }
+    th {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div>
+  <center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="195"></center>
+</div>
+<center><h2>Metodos Numericos - EDO</h2></center>
+  <form id="form">
+      <table class="table">
+        <tr><td>
+              <label for="eq">df(y(t), t)/dt=</label>
+            <input type="text" id="eq" size = '55' value="-12.5y + 25" />
+          </td></tr>
+        <tr><td>
+          t0:<input type="number" size='6' min='0' max='20' step='0.01' value="0" id="a"  name="a"  title="Valor de t0" onchange="Niter();">
+          y0:<input type="number" size='6' min='-10' max='10' step='0.01' value="0" id="yo"  name="yo" onchange='' title="Valor de y0" >
+        </td></tr>
+		<tr><td>
+        tf:<input type="number"  size='6' name="b" id="b" min='0' max='20' step='0.01' value ="0.8" title="Valor de tf" onchange="Niter();">
+             h:<input type="number" size='6'  name="h" id="h" min='0.01' max='1' step='0.01' value ="0.04" 
+            onchange="Niter();" title="Valor del incremento" >
+          </td></tr>
+		  <tr><td>
+              <input type="button" onclick="winformxxx();" value="Draw-fly " />
+			  <input type="button" onclick="ocultarPanel();" value="Drawing " />
+			  <input type="button" onclick="abortar();" value="Cancelar" />
+			  <input type="button" onclick="Coger();" value="Solver &nbsp &nbsp" />
+          </td></tr>
+        
+      </table>
+</form>
+<br><br>
+  <center><span id="puntos" style='display:none;'></span></center>
+  <span id="ideuler"> </span>
+   
+
+  <script>
+function Niter(){
+	var to = parseFloat(document.getElementById("a").value);
+	var tf = parseFloat(document.getElementById("b").value);
+	var h = parseFloat(document.getElementById("h").value);
+	niteracion = (tf - to)/h;
+}
+
+var parser = math.parser();
+var s1,s2, f, max_y=-10,min_y=0, tini, tfin;
+
+function winformxxx() {
+win = new Window({className: "mac_os_x", maximizable:true, resizable:true, title:"Metodos Numericos", 
+  width:(window.innerWidth*80/100), height:(window.innerHeight*80/100), destroyOnClose:true}); 
+win.getContent().innerHTML = "<PRE><center><div id='puntos'></div></center></PRE>";
+
+  //"<div id='sample-4'></div>";   
+win.setConstraint(false);
+win.showCenter(false);
+win.toFront(false);
+drawing(s1,s2,tini,tfin,min_y,max_y);//evaluador(); //draw();
+}
+
+function alertaplot(){
+  
+  document.getElementById("ta").value =   document.getElementById("a").value;
+  document.getElementById("tb").value =   document.getElementById("b").value;
+  
+}
+
+
+
+function dfdx(df,t,y){
+ // var parser = math.parser();
+  
+  parser.eval('g(t,y) ='+df);
+  parser.set('t',t);
+  parser.set('y',y);
+  var g1 = parser.eval('g(t,y)'); 
+  g1 = parseFloat(g1);
+    return g1;
+}
+
+function drawing(s,exacta,xmin,xmax,ymin,ymax){
+var delta=0.001;
+try{ 
+functionPlot({
+    target: '#puntos',
+    tip: {
+    xLine: true,    // dashed line parallel to y = 0
+    yLine: true,    // dashed line parallel to x = 0
+    
+  },
+  width:(window.innerWidth*.8),  // width:(screen.availWidth*.7),
+  height:(window.innerHeight*.8),     //height:(screen.availHeight*.7),
+  xAxis:{domain: [xmin-delta, xmax+delta],label:'eje-x'},
+  yAxis:{domain: [ymin-delta, ymax+delta],label:'eje-y'},
+  grid: true,
+  data: [
+  {
+    color: '',
+    points:s,     //P, 
+    fnType: 'points',
+    graphType:'polyline'
+
+  },
+
+  { 
+    color: 'red',
+     points:exacta,
+      fnType: 'points',
+      graphType: 'polyline'
+
+  }]
+})
+}
+ catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+          //document.getElementById("formula2").style="display:block";
+          //functionPlot().url;
+}
+
+function draw(s,exacta,xmin,xmax,ymin,ymax){
+
+var delta=0.001;
+try{ 
+functionPlot({
+    target: '#puntos',
+    tip: {
+    xLine: true,    // dashed line parallel to y = 0
+    yLine: true,    // dashed line parallel to x = 0
+    
+  },
+  width:(window.innerWidth*.8),  // width:(screen.availWidth*.7),
+  height:(window.innerWidth*.8),     //height:(screen.availHeight*.7),
+  xAxis:{domain: [xmin-delta, xmax+delta],label:'eje-x'},
+  yAxis:{domain: [ymin-delta, ymax+delta],label:'eje-y'},
+  grid: true,
+  data: [
+  {
+    color: '',
+    points:s,     //P, 
+    fnType: 'points',
+    graphType:'polyline'
+
+  },
+
+  { 
+    color: 'red',
+     points:exacta,
+      fnType: 'points',
+      graphType: 'polyline'
+
+  }]
+})
+}
+ catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+          //document.getElementById("formula2").style="display:block";
+          //functionPlot().url;
+}
+
+  	function iniciar(){
+      //fun_formular2plot();
+       Niter();
+      //puntos();
+  	}
+
+window.onload=iniciar();
+
+  </script>
+
+</body>
+</html>

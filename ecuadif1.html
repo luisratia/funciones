@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+	<title>Ecuaciones Diferenciales </title>
+	<meta charset="utf-8">
+	<link rel="icon" href='favicon.ico' type="image/x-icon">
+	<!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+	<meta name="description" content="Este es un documento HTML5">
+	<meta name="keywords" content="HTML, CSS, JavaScript" />
+	<link href="themes/default.css" rel="stylesheet" type="text/css" >
+	<link href="themes/mac_os_x.css" rel="stylesheet" type="text/css" >
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/miestiloflex.css">
+	<script src='js1/jquery-1.7.2.js'></script>
+	<script src="js1/vendor/d3.js"></script>
+	<script src="js1/math.js"></script>
+	<script src="js1/function-plot.js"></script>
+	  <script src='js1/ajaxhttp.js'></script>
+	<script type="text/javascript" src="javascripts/prototype.js"> </script>
+	<script type="text/javascript" src="javascripts/window.js"> </script>
+	<script type="text/javascript" src="javascripts/debug.js"> </script>
+	<script>
+	var visible = false;
+	peticion_http= null ; //new descargaArchivo();
+  var niteracion=10;
+function muestraContenido() {
+	if(peticion_http.readyState == 4) {
+		if(peticion_http.status == 200) {
+		eval(peticion_http.responseText);
+ }else {peticion_http.abort();}
+}
+}
+  function Coger() {//Función coger, en esta caso le entra
+	peticion_http= new descargaArchivo();
+	document.getElementById("puntos").style.display="none";
+	document.getElementById("ideuler").style.display="block";
+	document.getElementById("ideuler").innerHTML = "Procesando datos espere por favor numero de iteraciones..."+niteracion;
+	peticion_http.onreadystatechange = muestraContenido;
+	peticion_http.open('GET', 'euler.txt', true);
+	peticion_http.send(null);
+}
+function abortar(){
+	peticion_http.abort();
+	peticion_http = null;
+	window.location.reload(false);
+	return false;
+}
+		function iniciar() {
+		var elemento = document.getElementById("menuicono");
+		elemento.addEventListener("click", mostrarMenu());
+	}
+	function openmenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "block";
+}
+	function closemenu() {
+	var mainmenu = document.getElementById("mainmenu");
+	mainmenu.style.display = "none";
+}
+
+	function mostrarMenu() {
+		var elemento = document.getElementById("menuprincipal");
+		if (!visible) {
+		elemento.style.display = "flex";
+		visible = true;
+	} else {
+	elemento.style.display = "none";
+	visible = false;
+	}
+	}
+	function ocultarPanel() {
+		var elemento = document.getElementById("puntos");
+		if (elemento.style.display == "none") {
+		elemento.style.display = "flex";
+		}else {
+		elemento.style.display = "none";
+		}
+		drawing(s1,s2,tini,tfin,min_y,max_y);
+	}
+	window.addEventListener("load", iniciar());
+	//window.onload=iniciar();
+	
+	</script>
+	<style>
+    #ideuler{
+	height: 300px;
+	overflow-y:auto;
+	}
+	td {
+      font-size:1.2em;
+	  border-width: 0px;
+    }
+    .btn-circle.btn-sm{
+		width: 30px;
+		height: 30px;
+		padding: 0px 0px;
+		border-radius:15px;
+		font-size: 0.5em;
+		text-align: center;
+	}
+	
+	.btn-circle.btn-md{
+		width: 50px;
+		height: 50px;
+		padding: 0px 0px;
+		border-radius:25px;
+		font-size: 0.6em;
+		text-align: center;
+	}
+	.btn-circle.btn-x1{
+		width: 70px;
+		height: 70px;
+		padding: 0px 0px;
+		border-radius:35px;
+		font-size: 0.7em;
+		text-align: center;
+	}
+	
+  </style>
+	</head>
+
+	<body>
+	
+	<header id="menuicono-img">
+	<div style="positionion:relative; top:0;left:0;"><center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="195"></center></div>
+
+	<div id="menuicono" onclick="mostrarMenu();">
+
+	<img src="img/iconmenu.png"  style="width: 10%;">
+	</div>
+	</header>
+	<div id="mainmenu" onclick="closemenu();">
+					<nav id="menu-mini">
+						<div id="closemenu">
+							<img src="iconclose.png" style="width: 100%;" onclick="closemenu();">
+						</div>
+						<div class="menu-item">
+							<a href="/">Principal</a>
+						</div>
+						<div class="menu-item">
+							<a href="/books.php">Libros</a>
+						</div>
+						<div class="menu-item">
+							<a href="/guides.php">Guías Rápidas</a>
+						</div>
+						<div class="menu-item">
+							<a href="/videocourses.php">Cursos en Video</a>
+						</div>
+						<div class="menu-item">
+							<a href="/newsletter.php">Boletín</a>
+						</div>
+						<div class="menu-item">
+							<a href="/contact.php">Contacto</a>
+						</div>
+					</nav>
+				</div>
+	<nav id="menuprincipal">
+	<div>
+	<ul>
+		<li><a href="index.html">Principal</a></li>
+		<li><a href="implicitdex.html">Implicitas</a></li>
+		<li><a href="parametrictdex.html">Parametricas</a></li>
+		<li><a href="polardex.html">Polares</a></li>
+		<li><a href="ecuadif1.html">EDO</a></li>
+		<li><a href="ecuadif2orden.html">EDO2</a></li>
+		<li><a href="storage.html">df(x)/dx</a></li>
+	</ul>
+	</div>
+	</nav>
+	<main>
+	<div>
+	<section id="articulosprincipales">
+	<article>
+		<h1>Ecuaciones Diferenciales Ordinarias</h1>
+		<time datetime="2016-12-23" pubdate>
+			<div class="numerodia">23</div>
+			<div class="nombredia">Viernes</div>
+		</time>
+		<p>Al esudiar fenomenos fisicos, en general, se encuentran leyes que involucran relaciones entre las magnitudes
+		y su derivadas. Asi se obtienen ecuaciones que contienen no solo la funcion incognita, sino una o mas derivadas 
+		de la misma. Tales ecuaciones se llaman ecuaciones diferenciales.</p>
+		<p>Una Ecuacion de la forma: F(t, y(t), dy(t)/dt, d<sup>2</sup>y(t)/dt<sup>2</sup>,...) = 0, se denomina Ecuacion diferencial ordinaria.</p>
+
+	<figure>
+<form id="form">
+      <table class="table">
+        <tr><td>
+              <label for="eq">df(t, y(t))/dt=</label>
+            <input type="text" id="eq" size = '55' value="-12.5y + 25" />
+          </td></tr>
+        <tr><td>
+          t0:<input type="number" size='6' min='0' max='20' step='0.01' value="0" id="a"  name="a"  title="Valor de t0" onchange="Niter();">
+          y0:<input type="number" size='6' min='-10' max='10' step='0.01' value="0" id="yo"  name="yo" onchange='' title="Valor de y0" >
+        </td></tr>
+		<tr><td>
+        tf:<input type="number"  size='6' name="b" id="b" min='0' max='20' step='0.01' value ="0.8" title="Valor de tf" onchange="Niter();">
+             h:<input type="number" size='6'  name="h" id="h" min='0.01' max='1' step='0.01' value ="0.04" 
+            onchange="Niter();" title="Valor del incremento" >
+          </td></tr>
+		  <tr><td>
+              <input type="button" class='btn btn-warning btn-circle btn-x1' onclick="winformxxx();" value="Draw-fly " />
+			  <input type="button" class='btn btn-primary btn-circle btn-x1' onclick="ocultarPanel();" value="Drawing " />
+			  <input type="button" class='btn btn-danger btn-circle btn-x1' onclick="abortar();" value="Cancelar" />
+			  <input type="button" class='btn btn-dark btn-circle btn-x1' onclick="Coger();" value="Solver" />
+          </td></tr>
+        
+      </table>
+</form>
+
+		<div id="formula2" style='display:none;'></div>
+		<div id="panel"></div>
+		<div id="puntos"></div>
+		<div id="ideuler" style='display:none;'> </div>
+	</figure>
+	</article>
+	<article>
+	<h1>EDO: Metodos Numericos</h1>
+	<time datetime="2016-12-7" pubdate>
+	<div class="numerodia">7</div>
+	<div class="nombredia">Miércoles</div>
+	</time>
+	<p>Una ecuacion diferencial de primer orden esta dada por la siguiente expresion: F(t, y(t), dy(t)/dt) = 0, o de manera explicita por la siguiente ecuacion: dy/dx = f(x,y), con la condicion inicial y(to)= yo</p><p></p><p>Metodo de Euler</p><p>La primera derivada ofrece una estimacion de la pendiente, dado un punto (t<sub>i+1</sub>, y<sub>i+1</sub>) entonces: y<sub>i+1</sub> = y<sub>i</sub> + f( t<sub>i</sub>, y<sub>i</sub>)*h, donde h = t<sub>i+1</sub> - t<sub>i</sub></p>
+	<figure>
+	<!--<img src="img/diapositiva1.jpg">-->
+	</figure>
+	</article>
+	</section>
+	<aside id="infoadicional">
+	<h1></h1>
+	<p></p>
+	<p></p>
+	</aside>
+	<div class="recuperar"></div>
+	</div>
+	</main>
+	<footer id="pielogo">
+	<div>
+	<section class="seccionpie">
+	<h1>Sitio Web</h1>
+	<p><a href="index.html">Principal</a></p>
+	<p><a href="fotos.html">Fotos</a></p>
+	<p><a href="videos.html">Videos</a></p>
+	</section>
+	<section class="seccionpie">
+	<h1>Ayuda</h1>
+	<p><a href="contacto.html">Contacto</a></p>
+	</section>
+	<section class="seccionpie">
+	<address>Toronto, Canada</address>
+	<small>&copy; Derechos Reservados 2016</small>
+	</section>
+	<div class="recuperar"></div>
+	</div>
+	</footer>
+	
+<script>
+function Niter(){
+	var to = parseFloat(document.getElementById("a").value);
+	var tf = parseFloat(document.getElementById("b").value);
+	var h = parseFloat(document.getElementById("h").value);
+	niteracion = (tf - to)/h;
+}
+var parser = math.parser();
+var s1,s2, f, max_y=-10,min_y=0, tini, tfin;
+
+function dfdx(df,t,y){
+ // var parser = math.parser();
+  
+  parser.eval('g(t,y) ='+df);
+  parser.set('t',t);
+  parser.set('y',y);
+  var g1 = parser.eval('g(t,y)'); 
+  g1 = parseFloat(g1);
+    return g1;
+}
+function winformxxx() {
+win = new Window({className: "mac_os_x", maximizable:true, resizable:true, title:"Metodos Numericos", 
+  width:(window.innerWidth*80/100), height:(window.innerHeight*80/100), destroyOnClose:true}); 
+win.getContent().innerHTML = "<PRE><center><div id='puntos'></div></center></PRE>";
+
+  //"<div id='sample-4'></div>";   
+win.setConstraint(false);
+win.showCenter(false);
+win.toFront(false);
+drawing(s1,s2,tini,tfin,min_y,max_y);//evaluador(); //draw();
+}
+
+function drawing(s,exacta,xmin,xmax,ymin,ymax){
+var delta=0.008;
+if (window.innerWidth*0.7< window.innerHeight*0.7){
+			tamano = window.innerWidth*0.7;
+	}else{tamano = window.innerHeight*0.7;}
+try{ 
+functionPlot({
+    target: '#puntos',
+    tip: {
+    xLine: true,    // dashed line parallel to y = 0
+    yLine: true,    // dashed line parallel to x = 0
+    
+  },
+  width:tamano,  // width:(screen.availWidth*.7),
+  height:tamano,     //height:(screen.availHeight*.7),
+  xAxis:{domain: [xmin-delta, xmax+delta],label:'eje-x'},
+  yAxis:{domain: [ymin-delta, ymax+delta],label:'eje-y'},
+  grid: true,
+  data: [
+  {
+    color: '',
+    points:s,     //P, 
+    fnType: 'points',
+    graphType:'polyline'
+
+  },
+
+  { 
+    color: 'red',
+     points:exacta,
+      fnType: 'points',
+      graphType: 'polyline'
+
+  }]
+})
+}
+ catch (err) {
+      //console.log(err);
+      alert(err);
+    }
+          
+}
+
+  
+  
+  
+  function windraw() {
+if (window.innerWidth*0.7< window.innerHeight*0.7){
+			tamano = window.innerWidth*0.8;
+	}else{tamano = window.innerHeight*0.8;}
+win = new Window({className: "mac_os_x", maximizable:false, resizable:true, title:"Metodos Numericos", 
+  width:tamano, height:tamano, destroyOnClose:true}); 
+win.getContent().innerHTML = "<PRE><center><div id='plot'></div></center></PRE>";
+
+  //"<div id='sample-4'></div>";   
+win.setConstraint(false);
+win.showCenter(false);
+win.toFront(false);
+draw();
+document.getElementById("botonwin").disabled=true;
+
+}
+
+
+function fun_formular2(){ 
+var Formula3 = "<table class='table' width='40%'>";
+Formula3 += "<tr>";
+Formula3 += "<td><input type='button'   value='Redraw'  class='btn btn-primary btn-circle btn-x1' onclick ='draw();'> </td>";
+Formula3 += "<td><input type='button'   value='Panel'  class='btn btn-primary btn-circle btn-x1' onclick ='ocultarPanel();'> </td>";
+Formula3 += "<td><input type='button' id='botonwin' class='btn btn-danger btn-circle btn-x1' value='winDraw' onclick='windraw();'></td>";
+Formula3 += "</tr>";
+Formula3 += "</table>";
+document.getElementById("panel").innerHTML = Formula3;
+} 
+window.onload=Niter();
+</script>
+</body>
+</html>

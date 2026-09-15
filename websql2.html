@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/miestiloflex.css">
+	<script src='js1/jquery-1.7.2.js'></script>
+<script type="text/javascript">
+function almacenar(){
+//abrir BD(nombre, versión, nombre_ampliado, tamaño en bytes)
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+//crear una tabla: asíncrono y transaccional, como todas las llamadas
+}
+bd.transaction(function(trans) { 
+//ejecutar SQL(sentencia_SQL, array_con_parámetros)
+trans.executeSql('CREATE TABLE IF NOT EXISTS  tareas(ID INTEGER PRIMARY KEY ASC, texto TEXT, prioridad INTEGER)', []);
+});
+//insertar datos
+var texto = prompt("Introduce nueva tarea");
+var prioridad = parseInt(prompt("Introduce su prioridad"));
+bd.transaction(function(trans) {
+trans.executeSql('INSERT INTO tareas(texto,prioridad) VALUES (?,?)', [texto, prioridad])
+});
+
+//obtener datos
+bd.transaction(function(trans) {
+//a executeSQL le podemos pasar un callback que se ejecutará en caso
+//de éxito, y otro en caso de error
+trans.executeSql('SELECT * FROM tareas', [], verDatos, error)
+});
+//el callback automáticamente recibe la transacción y, si es un SELECT,
+//los registros resultado de la consulta
+function verDatos(trans, rs) {
+//rows son los registros en sí
+for(var i=0; i<rs.rows.length; i++)
+alert("Tarea: " + rs.rows.item(i).ID + "\n" + rs.rows.item(i).texto + "\n" + "Prioridad: " + rs.rows.item(i).prioridad);
+}
+function error() {
+alert("Se ha producido un error con la BD");
+}
+function fecha_actual(){
+var f = new Date();
+var fecha_a = f.getDate()+ "/"+ parseInt(f.getMonth()+1)+"/"+f.getFullYear()+ " " + f.getHours()+":"+f.getMinutes();
+document.getElementById('fechahora').value=fecha_a;
+//return fecha_a;
+}
+
+function obtenerDatos(){
+var f = new Date();
+document.getElementById('fecha').innerHTML ="Hoy es :" +f.getDate()+ "/"+ parseInt(f.getMonth()+1)+"/"+f.getFullYear();
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+
+bd.transaction(function (tx) {
+tx.executeSql('SELECT * FROM tareas order by ID, fechatarea13 desc', [], function (tx, results) {
+var len = results.rows.length, i;
+msg = "<p>Found rows: " + len + "</p>";
+document.querySelector('#status').innerHTML = msg;
+var msg2="";
+var tabla='<center><table style="width:90%;aling:center" class="table"><thead><tr><th>#</th><th>Tareas</th><th>prioridad</th><th>Fecha</th><th colspan="">Delete</th><th>Update</th></tr></thead>';
+tabla +='<tbody>';
+for (i = 0; i < len; i++){
+tabla += '<tr><td>' + parseInt(results.rows.item(i).ID) + '</td><td>' + results.rows.item(i).texto + '</td><td>' + parseInt(results.rows.item(i).prioridad) +'</td><td>' + results.rows.item(i).fechatarea13 +'</td><td style="color:red"; onclick="alerta(this);">Delete<span style="display:none;"> :' + parseInt(results.rows.item(i).ID) + '</span></td><td style="color:blue"; onclick="actualizar(this);">Update<span style="display:none;"> :' + parseInt(results.rows.item(i).ID) + '</span></td></tr>';
+}
+tabla +='</tbody></table></center>';
+document.querySelector('#status').innerHTML += tabla;
+
+}, null);
+});
+}
+function alerta(expre){
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+cadena = (expre.textContent).split(":");
+reg = parseInt(cadena[1]);
+//alert("Soy una prueba:  "+reg);
+if(window.confirm("Realmente quiere borrar el regisro? #" +reg)){
+bd.transaction(function(trans) {
+trans.executeSql('DELETE FROM  tareas WHERE ID=?', [reg], obtenerDatos, error)
+});
+}
+}
+function insertar(){
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+var texto = document.getElementById("texto").value;
+var prioridad = parseInt(document.getElementById("prioridad").value);
+var fecha = (document.getElementById("fechahora").value);
+
+bd.transaction(function(trans) {
+trans.executeSql('INSERT INTO tareas(texto,prioridad,fechatarea13) VALUES (?,?,?)', [texto, prioridad, fecha], obtenerDatos, error)
+});
+document.getElementById("texto").value="";
+document.getElementById("prioridad").value="";
+}
+
+function borrar(){
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+//var texto = document.getElementById("texto").value;
+var id = parseInt(document.getElementById("ident").value);
+bd.transaction(function(trans) {
+trans.executeSql('DELETE FROM  tareas WHERE ID=?', [id], obtenerDatos, error)
+});
+}
+
+function actualizar(){
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+var texto = document.getElementById("texto").value;
+var prioridad = parseInt(document.getElementById("prioridad").value);
+var id = parseInt(document.getElementById("ident").value);
+bd.transaction(function(trans) {
+trans.executeSql('UPDATE tareas SET prioridad =?, texto =?  WHERE ID=?', [prioridad,texto,id], obtenerDatos, error)
+});
+}
+function resetear(){
+document.getElementById("texto").value="";
+document.getElementById("prioridad").value="";
+}
+function altertable(){
+var f = new Date();
+var t= f.getDate()+ "/"+ parseInt(f.getMonth()+1)+"/"+f.getFullYear();
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+bd.transaction(function(trans) {
+trans.executeSql('ALTER TABLE  tareas ADD COLUMN IF NOT EXISTS fechatarea13 datetime NOT NULL DEFAULT "'+t+'"',[], obtenerDatos, error)
+});
+}
+function borrartable(){
+var bd = openDatabase('Tareas', '1.0', 'tareas pendientes',5*1024*1024);
+bd.transaction(function(trans) {
+trans.executeSql('ALTER TABLE  tareas DROP COLUMN  fechatarea12', obtenerDatos, error)
+});
+}
+
+</script>
+</head>
+
+<body onload="obtenerDatos(); fecha_actual();">
+<center><table border='0' WIDTH='90%' HEIGHT='100' style='background-color:;font-size:2.5em;color:#6495ed;font-family:cursive;'><tr><td><div style="positionion:relative; top:0;left:0;"><center><img src='img/html5img.png' name="Imagen1"  width="100%" height="195"></center></div></td><td> HTML5 + Api Web Sql </td></tr></table></center>
+<div class='container'><div class='row'><div class='col-md-12'><center><p style=color:red font-size:2.5em>CRUD: Crear-Leer-Actualizar-Borrar</p><div id='fecha' name='fecha'></div></div></div></div></center>
+<table class="table"><tr><td>
+<form method="post" action="websql2.html">
+        <div class="form-group">
+          <label for="texto">Tarea</label>
+          <input type="text" name="texto" id="texto" placeholder="Insertar tarea" class="form-control" minlength=3 required>
+        </div>
+        <div class="form-group">
+          <label for="prioridad">Prioridad</label>
+          <input type="number" name="prioridad" id="prioridad"  value="1" placeholder="Insertar prioridad" class="form-control">
+        </div>
+		<div class="form-group">
+          <label for="fechahora">Fecha</label>
+          <input type="datetime" name="fechahora" id="fechahora" onclick="fecha_actual();" class="form-control">
+        </div>
+		
+		<input type="button" class="btn btn-primary" onclick="insertar();" value="Enviar" />
+		<input type="button" class='btn btn-primary' onclick="resetear();" value="Reset" />
+
+
+</form>	
+</td></tr></table>	
+<div id="status" name="status"></div>
+</body>
+</html>

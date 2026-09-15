@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src='js1/ajaxhttp.js'></script>
+<title>Hola Mundo con AJAX</title>
+<script type="text/javascript">
+
+// Preparar la funcion de respuesta
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+// Realizar peticion HTTP
+peticion_http.open('GET', 'holamundo2.txt', true);
+peticion_http.send(null);
+function muestraContenido() {
+if(peticion_http.readyState == 4) {
+if(peticion_http.status == 200) {
+document.getElementById("respuesta").innerHTML = peticion_http.responseText;}
+}
+}
+</script>
+</head>
+<body   onload=";">
+<div id="respuesta">
+</body>
+</html>

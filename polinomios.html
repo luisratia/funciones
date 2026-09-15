@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1">
+  <meta charset="UTF-8">
+  <title>Polinomios - Opeariones</title>
+    <script src="js1/vendor/d3.js"></script>
+    <script src="js1/math.js"></script>
+    <script src="js1/function-plot.js"></script>
+  <!--<script src="js/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>-->
+  <link rel="stylesheet" type="text/css" href="css/estilo2.css">
+
+  <style>
+    body,
+    html,
+    table td,
+    table th,
+    input[type=text] {
+      font-size: 11pt;
+      font-family: verdana, arial, sans-serif;
+    }
+
+    h1 {
+      font-size: 14pt;
+    }
+
+    input[type=text] {
+      padding: 5px;
+      width: 400px;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table td,
+    table th {
+      padding: 5px;
+      border: 1px solid lightgray;
+    }
+
+    table th {
+      background-color: lightgray;
+    }
+
+  </style>
+</head>
+<body>
+<div>
+  <center><img src='img/recursividad-infinita.jpg' name="Imagen1"  width="100%" height="95"></center>
+</div>
+<center><h1>Expression Polinomicas - Operaciones </h1></center>
+<div id="probando"></div>
+<div id="probando2"></div>
+
+<table>
+  <tr>
+    <th>P->[ao,a1,..an]</th>
+    <td><input type="text" id="expr" onfocus="sintaxis(expr);" oninput="sintaxis(expr);" /></td>
+  </tr>
+  <tr>
+    <th>Q->[bo,b1,..bm]</th>
+    <td><input type="text" id="exprq" onfocus="sintaxis(this);"  oninput="sintaxis(exprq);"/></td>
+  </tr>
+    <tr  style="display:;">
+    <th id="th01">P*Q->[co,c1,..ck]</th>
+    <td><input type="text" id="exprpq" readonly="true" onfocus="sintaxis(this);" /></td>
+  </tr>
+  <tr  style="display:none;">
+    <th>Pretty print</th>
+    <td><div id="pretty">$$$$</div></td>
+  </tr>
+  <tr>
+    <th>Result</th>
+    <td><div id="result"></div></td>
+  </tr>
+  <tr>
+    <th>Polinomio Result</th>
+    <td><div id="presult"   onclick="UpdateMath();"></div></td>
+  </tr>
+  <tr>
+    <th>P(x)</th>
+    <td>
+      <div class="box" id="box" style="visibility:hidden;">
+        <div id="MathOutput" class="output">$${}$$</div>
+      </div>
+    </td>
+  </tr>
+</table>
+<div id="opciones"  style="visibility:hidden;">
+<b>Parenthesis option:</b>
+<input type="radio" name="parenthesis" value="keep" onclick="parenthesis = 'keep'; expr.oninput();" checked>keep
+<input type="radio" name="parenthesis" value="auto" onclick="parenthesis = 'auto'; expr.oninput();">auto
+<input type="radio" name="parenthesis" value="all" onclick="parenthesis = 'all'; expr.oninput();">all
+<br/>
+<b>Implicit multiplication:</b>
+<input type="radio" name="implicit" value="hide" onclick="implicit = 'hide'; expr.oninput();" checked>hide
+<input type="radio" name="implicit" value="show" onclick="implicit = 'show'; expr.oninput();">show
+</div>
+<br>
+<input style="border-width: 0px;display:none;" type="button" value="Generar P(x)" id="genera01" 
+  class='' onclick='generarpoli(expr);  UpdateMath();'/>
+<input style="border-width: 0px;display:none;" type="button" value="Generar Q(x)" id="genera02" 
+  class='' onclick='generarpoli(exprq); UpdateMath();'/>
+  <input style="border-width: 0px;display:none;" type="button" value="Generar P*Q" id="genera04" 
+  class='' onclick='generarpoli(exprpq); UpdateMath();'/>
+
+  <input style="border-width: 0px;display:;" type="button" value="P(x) * Q(x)" id="genera03" 
+  class='' onclick='product_pq();'/>
+  <input style="border-width: 0px;display:;" type="button" value="P(x) + Q(x)" id="genera05" 
+  class='' onclick='suma_pq();'/>
+  <input style="border-width: 0px;display:;" type="button" value="P(x) - Q(x)" id="genera06" 
+  class='' onclick='resta_pq();'/>
+
+
+<script>
+
+  var expr = document.getElementById('expr'),
+      exprq = document.getElementById('exprq'),
+      exprpq = document.getElementById('exprpq'),
+      pretty = document.getElementById('pretty'),
+      result = document.getElementById('result'),
+      presult = document.getElementById('presult'),
+      parenthesis = 'keep',
+      implicit = 'hide';
+  var prueba =[];
+  var f =[];
+
+  var parser = math.parser();
+  // initialize with an example expression
+  function iniciar(){ 
+  expr.value = '[-1, 2, 3, 1]';
+  exprq.value = '[1,3,4]';
+  exprpq.value = '[-1, -1, 5, 18, 15, 4]';
+  pretty.innerHTML = '$$' + math.parse(expr.value).toTex({parenthesis: parenthesis}) + '$$';
+  result.innerHTML = math.format(math.eval(expr.value),{notation: '', precision: 14});
+  var texto = result.textContent;// || result.innerText;
+  var res = cambiarArray_java(texto);
+  res = math.matrix(res);   //parser.eval('a='+(pr+p2));
+  result.textContent =res;
+  generarpoli(expr);
+  mathmas();
+// Find the input field
+}
+   function sintaxis(expr) {
+    var node = null;
+    var node2 = null;
+var texto;
+var res;
+//presult = document.getElementById('presult');
+    try {
+      // parse the expression
+      node = math.parse(expr.value);
+
+      // evaluate the result of the expression
+      result.innerHTML = math.format(node.compile().eval(),{notation: '', precision: 14});
+             texto = result.textContent;// || result.innerText;
+              res = cambiarArray_java(texto);
+              res = math.matrix(res);   //parser.eval('a='+(pr+p2));
+              result.textContent =res;
+              generarpoli(expr);
+                UpdateMath();
+
+      //presult.innerHTML =   expr.value;
+
+    }
+    catch (err) {
+      result.innerHTML = '<span style="color: red;">' + err.toString() + '</span>';
+     // presult.innerHTML = '<span style="color: red;">' + err.toString() + '</span>';
+    }
+
+    try {
+      // export the expression to LaTeX
+        var latex = node ? node.toTex({parenthesis: parenthesis, implicit: implicit}) : '';
+        //var latex2 = node2.toTex({parenthesis: parenthesis, implicit: implicit}) ;
+      console.log('LaTeX expression:', latex);
+      // display and re-render the expression
+      var elem = MathJax.Hub.getAllJax('pretty')[0];
+      MathJax.Hub.Queue(['Text', elem, latex]);
+// otro cambio
+
+    }
+    catch (err) {}
+  }
+
+</script>
+<script>
+   
+  function generarpoli(expr) {
+   var poli = "";
+    var xo =0;
+    var ndig =4;
+  //var dato= expr.value;
+  //probando.innerHTML="";
+  f = parser.eval('b ='+expr.value);
+
+  var tojava =[];
+ 
+  
+for (var k = 1; k<=f.size() ; k++){
+    parser.set('k',k); 
+    var a = parser.eval('a1=b[k]');
+
+  //var a = parser.eval('a1=b['+k+']');
+  a = math.round(Number((a)),ndig);
+  tojava.push(a);
+
+}
+
+for(var k=0; k < tojava.length; k++ )
+  {
+      //parser.set('k',k); 
+
+    if (xo == 0)
+     var m = "*x^"+k;
+   if (xo < 0)
+     var m = "*(x+"+(-1)*xo+")^"+k;
+   if (xo > 0)
+    var m = "*(x-"+xo+")^"+k;
+   if(k == 0) 
+    poli += tojava[k]; //parser.eval((der_n[k]));
+    if ((k > 0) && (tojava[k] != 0) && (tojava[k] > 0) )
+    poli +="+"+tojava[k]+m; //parser.eval((der_n[k]))
+   if ((k > 0) && (tojava[k] != 0) && (tojava[k] < 0) )
+    poli +="-"+(-1)*tojava[k]+m; //parser.eval((der_n[k]))
+ 
+  }
+             presult.textContent = poli;
+
+}
+
+</script>
+<script>
+  //
+  //  Use a closure to hide the local variables from the
+  //  global namespace
+  //
+  function mathmas() {
+    var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
+    var math = null, box = null;    // the element jax for the math output, and the box it's in
+
+    //
+    //  Hide and show the box (so it doesn't flicker as much)
+    //
+    var HIDEBOX = function () {box.style.visibility = "hidden"}
+    var SHOWBOX = function () {box.style.visibility = "visible"}
+
+    //
+    //  Get the element jax when MathJax has produced it.
+    //
+    QUEUE.Push(function () {
+      math = MathJax.Hub.getAllJax("MathOutput")[0];
+      box = document.getElementById("box");
+      SHOWBOX(); // box is initially hidden so the braces don't show
+    });
+
+    //
+    //  The onchange event handler that typesets the math entered
+    //  by the user.  Hide the box, then typeset, then show it again
+    //  so we don't see a flash as the math is cleared and replaced.
+    //
+    window.UpdateMath = function () {
+     var TeX = presult.textContent;  // 
+     //TeX = (parser.eval('f(x) ='+TeX)).toTex();
+      QUEUE.Push(["Text",math,TeX]);
+    }
+       
+  }
+</script>
+
+<script type="text/javascript">
+  function product_pq(){
+  var th01 = document.getElementById("th01");
+th01.textContent = "P * Q->[co,c1,..ck]";
+      var p1 = parser.eval('p ='+expr.value);
+      //var aux1 = parser.eval('p ='+expr.value);
+      var array_aux=[];
+
+      var q1 = parser.eval('q ='+exprq.value);
+  
+      var tamanopxq =parseInt(math.add(p1.size(), q1.size())) -1 //parseInt(n + m + 1);
+      //var pxq = math.matrix();   //[];
+      //pxq =math.zeros(tamanopxq);
+      var temp = math.zeros(tamanopxq);
+
+      p1 = p1.resize([tamanopxq],0); 
+
+      var pr =parser.eval('pr = '+p1);
+
+      var ptemp = parser.eval('ptemp = '+temp);       // Matrix, size [2],    [7, 7]
+          presult.textContent ="";
+
+      for (var k = 1; k <= q1.size() ; k++){
+        parser.set('k',k); 
+        var a = parser.eval('a1=q[k]');
+        
+            var p3 = parser.eval('a=q[k]*pr');
+            if (k > 1){
+              array_aux = cambiarArray_java(p3);
+
+              for(var j = 1; j < k; j++ ){ 
+              rotar_array(array_aux);
+              }//pr = parser.eval('pr='+p2); 
+                p3 = math.matrix(array_aux); // Matrix, size [0]
+            }
+              ptemp = math.add(p3,ptemp);
+
+           // presult.textContent +=p3+"+"+pr+"="+p2+"=>";
+      }
+      var res = cambiarArray_java(ptemp);
+      res = math.matrix(res);   //parser.eval('a='+(pr+p2));
+      result.textContent =res; //ptemp;
+      exprpq.value = res;
+      generarpoli(exprpq);
+      //UpdateMath();
+
+  }
+
+  function suma_pq(){
+var th01 = document.getElementById("th01");
+th01.textContent = "P + Q->[co,c1,..ck]";
+      var p1 = parser.eval('p ='+expr.value);
+      //var aux1 = parser.eval('p ='+expr.value);
+      var array_aux=[];
+
+      var q1 = parser.eval('q ='+exprq.value);
+      var n = math.add(p1.size(),0);
+      n = parseInt(n);
+      var m = math.add(q1.size(),0);
+      m = parseInt(m);
+      //var tamanopxq1 = n + m -1;
+      //var tamanopxq =parseInt(math.add(p1.size(), q1.size())) -1 //parseInt(n + m + 1);
+      var tama;
+      if (n > m){tama = n-m; q1 = q1.resize([n],0); }
+      else if (n < m ){tama =m-n; p1 = p1.resize([m],0);}
+
+      var temp ="";// math.zeros(tama);
+          temp  =math.add(q1, p1);
+      var ptemp = parser.eval('ptemp = '+temp);       // Matrix, size [2],    [7, 7]
+          presult.textContent ="";
+      
+      var res = cambiarArray_java(ptemp);
+      res = math.matrix(res);   //parser.eval('a='+(pr+p2));
+      result.textContent =res; //ptemp;
+      exprpq.value = res;
+      generarpoli(exprpq);
+      UpdateMath();
+
+  }
+
+function resta_pq(){
+var th01 = document.getElementById("th01");
+th01.textContent = "P - Q->[co,c1,..ck]";
+      var p1 = parser.eval('p ='+expr.value);
+      //var aux1 = parser.eval('p ='+expr.value);
+      var array_aux=[];
+
+      var q1 = parser.eval('q ='+exprq.value);
+      var n = math.add(p1.size(),0);
+      n = parseInt(n);
+      var m = math.add(q1.size(),0);
+      m = parseInt(m);
+      //var tamanopxq1 = n + m -1;
+      //var tamanopxq =parseInt(math.add(p1.size(), q1.size())) -1 //parseInt(n + m + 1);
+      var tama;
+      if (n > m){tama = n-m; q1 = q1.resize([n],0); }
+      else if (n < m ){tama =m-n; p1 = p1.resize([m],0);}
+
+      var temp ="";// math.zeros(tama);
+          temp  =math.subtract(p1, q1);
+      var ptemp = parser.eval('ptemp = '+temp);       // Matrix, size [2],    [7, 7]
+          presult.textContent ="";
+      
+      var res = cambiarArray_java(ptemp);
+      res = math.matrix(res);   //parser.eval('a='+(pr+p2));
+      result.textContent =res; //ptemp;
+      exprpq.value = res;
+      generarpoli(exprpq);
+      UpdateMath();
+
+  }
+
+function cambiarArray_java(expr){
+    var  f = parser.eval('b ='+expr);
+      var tojava =[];
+      var ndig =4;
+      for (var k = 1; k<=f.size() ; k++){
+        parser.set('k',k); 
+        var a = parser.eval('a1=b[k]');
+        a = math.round(Number(a),ndig);
+        tojava.push(a);
+      }
+  
+    return tojava;
+}
+
+function rotar_array(arreglo){
+  var elem1 = arreglo.pop();
+  arreglo = arreglo.unshift(elem1);
+  //var pcho = parser.eval('pcho ='+(arreglo));   
+}
+window.onload = iniciar();
+  //UpdateMath();
+
+</script>
+</body>
+</html>

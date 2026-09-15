@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1">
+	<meta charset="UTF-8">
+	<link rel="icon" href='favicon.ico' type="image/x-icon">
+  <title>WebWorkers</title>
+    <link rel="stylesheet" type="text/css" href="css/estilo.css">
+
+  <script src="math.js"></script>
+  <script> 
+		function iniciar() {
+		
+		dfx();
+		dfy();
+	}
+	
+		function dfx() {
+		var fxy=document.getElementById('eq').value;
+		//var parser = math.parser();
+		//parser.eval('g(x,y) ='+fxy);
+		var h = math.parse(fxy); // 12
+		//var g1 = parser.eval('g(x,y)'); 
+		var dfx = math.derivative(h, 'x').toString();
+		//var dfy = math.derivative(h, 'y').toString();
+		//document.getElementById("dfx").value = dfx; 
+		document.getElementById("cajadatosfx").innerHTML ='df/dx = '+ dfx;
+		//document.getElementById("cajadatosfy").innerHTML ='df/dy = '+ dfy;
+
+	}
+	function dfy() {
+		var fxy=document.getElementById('eq').value;
+		//var parser = math.parser();
+		//parser.eval('g(x,y) ='+fxy);
+		var h = math.parse(fxy); // 12
+		//var g1 = parser.eval('g(x,y)'); 
+		//var dfx = math.derivative(h, 'x').toString();
+		var dfy = math.derivative(h, 'y').toString();
+		//document.getElementById("dfx").value = dfx; 
+		//document.getElementById("cajadatosfx").innerHTML ='df/dx = '+ dfx;
+		document.getElementById("cajadatosfy").innerHTML ='df/dy = '+ dfy;
+
+	}
+	
+	window.addEventListener("load", iniciar());
+  </script>
+  <style>
+    body, input, select {
+      font: 12pt sans-serif;
+    }
+    input, select, th, #result {
+      padding: 5px 10px;
+    
+    }
+    th {
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+<div>
+  <center><img src='img/recursividad-infinita.jpg' name="Imagen1"  width="100%" height="95"></center>
+</div>
+<center><h1>Derivacion Simbolica</h1></center>
+
+  <section id="cajaformulario">
+  <table style="border:0"><tr><td>
+    <form name="formulario">
+      f(x,y)=<input type="text" name="eq" size='35' value="y*sin(x)+ x*cos(2y)"
+                                                   id="eq">
+		</td></tr>
+		<tr><td>
+      
+      <input type="button" name="boton" onclick="dfx();" id="boton"  
+                                               value="df(x,y)/dx">
+										   
+		<input type="button" name="boton2" onclick="dfy();" id="boton2"  
+                                               value="df(x,y)/dy">
+										   
+    </form>
+	</td></tr></table>	
+  </section>
+  <br>
+  <div id="cajadatosfx"></div>
+  <br>
+  <div id="cajadatosfy"></div>
+  
+  <script>
+  	window.onload=iniciar();
+
+  </script>
+  <br>
+  <br>
+</body>
+</html>

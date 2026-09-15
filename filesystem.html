@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html manifest="manifest.appcache">
+  <head>
+    <title>Filesystem API usage example</title>
+    <link rel="stylesheet" href="../css/style.css" type="text/css" media="all" />
+     
+    <script type="text/javascript">
+      var loaded = false;
+      window.onLaunchboxLoaded = function () {
+          loaded = true;
+          initFS();
+      }
+        function printText(str) {
+            var d = document.getElementById('text-box');
+            d.appendChild(document.createTextNode(str));
+            d.appendChild(document.createElement('br'));
+            d.scrollTop = d.scrollHeight;
+        }
+ 
+        // FileEntry methods
+          function initFS() {
+          alert("initfs");
+		  loaded = true;
+          window.webkitRequestFileSystem(window.TEMPORARY, 1024*1024, function(filesystem) {
+          fs = filesystem;
+          }, errorHandler);
+          }
+ 
+      function errorHandler(e) {
+        var msg = '';
+        switch (e.code) {           case FileError.QUOTA_EXCEEDED_ERR:
+          msg = 'QUOTA_EXCEEDED_ERR';
+        break;           case FileError.NOT_FOUND_ERR:
+          msg = 'NOT_FOUND_ERR';
+        break;           case FileError.SECURITY_ERR:
+          msg = 'SECURITY_ERR';
+        break;           case FileError.INVALID_MODIFICATION_ERR:
+          msg = 'INVALID_MODIFICATION_ERR';
+        break;          case FileError.INVALID_STATE_ERR:
+         msg = 'INVALID_STATE_ERR';
+        break;         default:
+          console.log(JSON.stringify(e));
+          msg = e.name;
+        break;
+        };
+        printText('Error: ' + msg);
+      }
+ 
+ 
+       
+      function createFile() {
+          fs.root.getFile(document.getElementById("txtFieldFile").value, { 'create' : true }, function(fileEntry) {
+                  printText("Created " + fileEntry.name + " file.");
+              }, errorHandler);
+      }
+       
+      function writeToFile(){
+      fs.root.getFile(document.getElementById("txtFieldFile").value, { 'create' : false }, function(fileEntry) {
+      var writer = fileEntry.createWriter();
+      writer.write(document.getElementById("txtFileContent").value);
+      writer.onwriteend = function(event) {
+        printText("Done");
+      };
+      writer.onerror = function(event) {
+        printText("Error occured.");
+      }
+    }, errorHandler);
+      }
+             function readFile(){        fs.root.getFile(document.getElementById("txtFieldFile").value, {}, function(entry) {          entry.file(function(fd) {
+            var reader = new FileReader();
+            reader.onload = function(event) {
+              printText("Read: " + reader.result);
+            };
+            reader.onerror = function(event) {
+              printText("Error occured.");
+            };
+            reader.readAsText(fd);
+          }, errorHandler);
+        }, errorHandler);
+      }
+       
+      function deleteFile(){
+        fs.root.getFile(document.getElementById("txtFieldFile").value, { 'create' : false }, function(fileEntry) {
+          fileEntry.remove(function() {
+            printText("File removed.");
+          }, errorHandler);
+        }, errorHandler);
+      }
+      //directories
+       
+      function createDir(){
+        fs.root.getDirectory("fooDir", { 'create' : true }, function(dirEntry) {
+          printText("Created " + dirEntry.name + " dir.");
+        }, errorHandler);
+      }
+    function lookupFiles(){
+      var dirReader = fs.root.createReader();
+      dirReader.readEntries(function(entries) {
+        if (!entries.length) {
+          printText('Filesystem is empty.');
+        } else {
+          printText(JSON.stringify(entries));
+        }
+        initFS();
+      }, false);
+    }
+     
+    function removeDir(){
+      fs.root.getDirectory('fooDir', {}, function(dirEntry) {
+        dirEntry.removeRecursively(function(){
+          printText('Directory successfully removed.');
+        }, errorHandler);
+      }, errorHandler);
+    }
+     
+    function clearOutput(){
+      var d = document.getElementById('text-box');
+      d.innerHTML = "";
+    }
+ 
+   
+    </script>
+  </head>
+   
+   
+  <body onload="initFS();">
+    <header>
+      <h3><span>Filesystem API usage example</span>
+      </h3>
+    </header>
+    <!--
+        <input type="button" onclick="checkApi();" value="Check API" /><br />
+        -->
+    <input type="text" id="txtFieldFile" value="sampleFileName.txt" />
+    <input type="text" id="txtFileContent" value="This is sample file content." />
+    <hr />
+    <input type="button" onclick="createFile();" value="create file" /><br />
+    <input type="button" onclick="writeToFile();" value="write to file" /><br />
+    <input type="button" onclick="readFile();" value="read file" /><br />
+    <input type="button" onclick="deleteFile();" value="delete file" /><br />
+    <input type="button" onclick="createDir();" value="create directory" /><br />
+	<input type="button" onclick="lookupFiles();" value="lookup directory" /><br />
+	<input type="button" onclick="removeDir();" value="delete directory" /><br />
+	<input type="button" onclick="clearOutput();" value="clear" />	<div id="text-box"></div>
+
+</body>
+</html>

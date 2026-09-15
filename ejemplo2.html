@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+<script src='js1/jquery-1.7.2.js'></script>
+	<script src="js1/vendor/d3.js"></script>
+	<script src="js1/math.js"></script>
+	<script src="js1/function-plot.js"></script>
+<script src='js1/ajaxhttp.js'></script>
+<title>Hola Mundo con AJAX</title>
+<script type="text/javascript">
+
+// Preparar la funcion de respuesta
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+// Realizar peticion HTTP
+peticion_http.open('GET', 'codigojavascript.txt', true);
+peticion_http.send(null);
+
+function muestraContenido() {
+if(peticion_http.readyState == 4) {
+if(peticion_http.status == 200) {
+ eval(peticion_http.responseText)}
+}
+}
+
+function Coger() {//Función coger, en esta caso le entra
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+peticion_http.open('GET', 'codigojavascript.txt', true);
+peticion_http.send(null);
+}
+function abortar(){
+	peticion_http.abort();
+	peticion_http = null;
+	window.location.reload(false);
+	return false;
+}
+
+function Integral() {//Función coger, en esta caso le entra
+peticion_http= new descargaArchivo();
+peticion_http.onreadystatechange = muestraContenido;
+peticion_http.open('GET', 'integrajavascript.txt', true);
+peticion_http.send(null);
+}
+
+function getRandInteger(min, max){
+	return (Math.floor(Math.random()*(max - min +1) + min));
+}
+
+
+function asignaFunct(){
+n1 = getRandInteger(1, 3);
+n = getRandInteger(1, 6);
+m = getRandInteger(1, 4);
+cadena =m+ "*cosh(x)^"+n+"+sinh(x)^"+n1;
+document.getElementById('eq').value=cadena;
+}
+
+function asignaCadena(){
+n1 = getRandInteger(1, 2);
+n = getRandInteger(1, 2);
+m = getRandInteger(2, 4);
+cadena = m+"*cosh(x)^"+n+"+sinh(x)^"+n1;
+if ((n==1) && (n1!=1)){
+	cadena = m+"*cosh(x)"+" +sinh(x)^"+n1;
+}
+if ((n!=1) && (n1==1)){
+	cadena = m+"*cosh(x)^"+n +" +sinh(x)";
+}
+if ((n==1) && (n1==1)){
+	cadena = m+"*cosh(x)" +" +sinh(x)";
+}
+
+
+return cadena;
+//document.getElementById('eq').value=cadena;
+}
+var parser = math.parser();
+
+function integrate(eq, start, end, step) {
+		var total = 0.0;
+		//step=0.001; //step || 0.01;
+		parser.eval('g(x) ='+eq);
+		for (var x = start; x <= end; x += step) {
+			parser.set('x',x);
+			parser.set('step',step);
+			g1= parser.eval('g(x + step/2)');
+			g1 = parseFloat(g1);
+			total = total+ g1*step;
+	}
+	return total;
+}
+
+
+function ArregloFunct(){
+var versionesObj = new Array(
+'x',
+'x^2',
+'x^3',
+'x^4',
+'x^5');
+
+var operadoresObj = new Array(
+'+',
+'-',
+'*',
+'/');
+n = versionesObj.length;
+k = operadoresObj.length;
+j = getRandInteger(0, k-1);
+i = getRandInteger(0, n-1);
+//m = operadoresObj[j];
+cadena2=versionesObj[i];
+cadena = asignaCadena();
+document.getElementById('eq').value=cadena2+" "+operadoresObj[j]+" ("+cadena+")";
+//return cadena2;
+}
+
+</script>
+</head>
+<body>
+<div>
+  <center><img src='img/inteligartificial.jpg' name="Imagen1"  width="100%" height="190"></center>
+</div>
+<div id="respuesta"></div>
+<br><br>
+<table><tr><td>
+<form name="formulario">
+      F(x)=<input type="text" name="eq" size='45' value="cosh(x)*sin(x)+ x*cos(2x)" id="eq">									   
+</form></td><td>
+<button onclick="Coger();">Hallar F'(x)</button></td></tr></table>
+<br>
+<button onclick="ArregloFunct();">Asigna F(x)</button>
+
+<br>
+<button class='btn btn-danger btn-circle btn-x1' onclick="abortar();">Cancelar</button>
+
+<button onclick="Integral();">Calcula Integral</button>
+<br>
+<div><textarea style="font-size:1.2em;" rows="4" name="cajadatosfx" cols='50' value="" id="cajadatosfx"></div>
+</body>
+</html>

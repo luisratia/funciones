@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>math.js | pretty printing with MathJax</title>
+
+  <script src="js/math.js"></script>
+  <script src="js/MathJax.js?config=TeX-AMS-MML_HTMLorMML.js"></script>
+
+  <style>
+    body,
+    html,
+    table td,
+    table th,
+    input[type=text] {
+      font-size: 11pt;
+      font-family: verdana, arial, sans-serif;
+    }
+
+    h1 {
+      font-size: 11pt;
+    }
+
+    input[type=text] {
+      padding: 5px;
+      width: 400px;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    table td,
+    table th {
+      padding: 5px;
+      border: 1px solid lightgray;
+    }
+
+    table th {
+      background-color: lightgray;
+    }
+
+  </style>
+</head>
+<body>
+
+<h1>
+  Expression evaluation with math.js, pretty printing with MathJax
+</h1>
+<div id="probando"></div>
+<div id="probando2"></div>
+
+<table>
+  <tr>
+    <th>Expression</th>
+    <td><input type="text" id="expr"/></td>
+  </tr>
+  <tr>
+    <th>Pretty print</th>
+    <td><div id="pretty">$$$$</div></td>
+  </tr>
+  <tr>
+    <th>Result</th>
+    <td><div id="result"></div></td>
+  </tr>
+  <tr>
+    <th>Pretty Result</th>
+    <td><div id="presult">$$$$</div></td>
+  </tr>
+</table>
+<b>Parenthesis option:</b>
+<input type="radio" name="parenthesis" value="keep" onclick="parenthesis = 'keep'; expr.oninput();" checked>keep
+<input type="radio" name="parenthesis" value="auto" onclick="parenthesis = 'auto'; expr.oninput();">auto
+<input type="radio" name="parenthesis" value="all" onclick="parenthesis = 'all'; expr.oninput();">all
+<br/>
+<b>Implicit multiplication:</b>
+<input type="radio" name="implicit" value="hide" onclick="implicit = 'hide'; expr.oninput();" checked>hide
+<input type="radio" name="implicit" value="show" onclick="implicit = 'show'; expr.oninput();">show
+<input style="border-width: 0px;display:;" type="button" value="Generar Poli" id="genera01" 
+  class='' onclick='generarpoli();'/>
+
+<script>
+
+  var expr = document.getElementById('expr'),
+      pretty = document.getElementById('pretty'),
+      result = document.getElementById('result'),
+      presult = document.getElementById('presult'),
+      parenthesis = 'keep',
+      implicit = 'hide';
+var prueba =[];
+var f =[];
+  var parser = math.parser();
+
+  // initialize with an example expression
+  expr.value = '[-1, 2, 3, 1]';
+  //prueba=parser.eval('a = [10, 2, -3, 45]');      // Matrix, [[1, 2], [3, 4]]
+
+  // f = math.eval(expr.value);
+  // var b = math.matrix(f);
+
+  // prueba = f;
+
+  pretty.innerHTML = '$$' + math.parse(expr.value).toTex({parenthesis: parenthesis}) + '$$';
+  result.innerHTML = math.format(math.eval(expr.value),{notation: 'fixed', precision: 4});
+
+// Modificaciones--desde aqui
+  presult.innerHTML =   '$$' + math.parse(math.format(math.eval(expr.value),{notation: 'fixed', precision: 4}).toString()).toTex({parenthesis: parenthesis}) + '$$';
+// fin modificaciones---------------
+
+
+  expr.oninput = function () {
+    var node = null;
+    var node2 = null;
+presult = document.getElementById('result');
+    try {
+      // parse the expression
+      node = math.parse(expr.value);
+      node2 = math.parse(math.format(math.eval(expr.value),{notation: 'fixed', precision: 4}).toString());
+
+      // evaluate the result of the expression
+      result.innerHTML = math.format(node.compile().eval(),{notation: 'fixed', precision: 4});
+      presult.innerHTML = math.format(node2.compile().eval());
+    }
+    catch (err) {
+      result.innerHTML = '<span style="color: red;">' + err.toString() + '</span>';
+     // presult.innerHTML = '<span style="color: red;">' + err.toString() + '</span>';
+    }
+
+    try {
+      // export the expression to LaTeX
+        var latex = node ? node.toTex({parenthesis: parenthesis, implicit: implicit}) : '';
+        var latex2 = node2 ? node2.toTex({parenthesis: parenthesis, implicit: implicit}) : '';
+      console.log('LaTeX expression:', latex);
+      console.log('LaTeX expression:', latex2);
+      // display and re-render the expression
+      var elem = MathJax.Hub.getAllJax('pretty')[0];
+      MathJax.Hub.Queue(['Text', elem, latex]);
+// otro cambio
+ var elem2 = MathJax.Hub.getAllJax('presult')[0];
+     MathJax.Hub.Queue(['Text', elem2, latex2]);
+    }
+    catch (err) {}
+  };
+</script>
+<script>
+  function generarpoli() {
+   
+  var dato= expr.value;
+  probando.innerHTML="";
+  f = parser.eval('b ='+expr.value);
+
+  tojava = [];
+for (var k = 1; k<=f.size() ; k++){
+    parser.set('k',k); 
+    var a = parser.eval('a1=b[k]');
+
+  //var a = parser.eval('a1=b['+k+']');
+  a = math.round(Number(parseFloat(a)),4);
+  tojava.push(a);
+  probando.innerHTML+=parser.eval('a1=b[k]') +"-->"+ f.size()+"=>"; //+ "esta otra"+f+"el producto"+'prueba*f='+parser.eval('d=a[a.length]*b');
+}
+ probando.innerHTML+="<br>"+tojava[0]+"=>"+tojava[tojava.length-1];
+}
+</script>
+</body>
+</html>
